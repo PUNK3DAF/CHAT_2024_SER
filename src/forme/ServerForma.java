@@ -5,6 +5,10 @@
 package forme;
 
 import controller.Controller;
+import java.util.List;
+import model.ModelTabeleUseri;
+import model.Poruka;
+import niti.PokreniServer;
 
 /**
  *
@@ -17,7 +21,9 @@ public class ServerForma extends javax.swing.JFrame {
      */
     public ServerForma() {
         initComponents();
+        pokreni();
         osveziTabelu();
+        Controller.getInstance().setSf(this);
     }
 
     /**
@@ -31,6 +37,10 @@ public class ServerForma extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableUseri = new javax.swing.JTable();
+        jButtonPokreniServer = new javax.swing.JButton();
+        jLabelMax = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTablePoruke = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -47,25 +57,72 @@ public class ServerForma extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTableUseri);
 
+        jButtonPokreniServer.setText("POKRENI SERVER");
+        jButtonPokreniServer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonPokreniServerActionPerformed(evt);
+            }
+        });
+
+        jLabelMax.setText("Max br korisnika: ");
+
+        jTablePoruke.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Title 1", "Title 2", "Title 3", "Title 4"
+            }
+        ));
+        jScrollPane2.setViewportView(jTablePoruke);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(368, Short.MAX_VALUE))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(88, 88, 88)
+                        .addComponent(jButtonPokreniServer, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(75, 75, 75)
+                        .addComponent(jLabelMax))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 401, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(61, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 275, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(64, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(26, 26, 26)
+                .addComponent(jButtonPokreniServer)
+                .addGap(27, 27, 27)
+                .addComponent(jLabelMax)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButtonPokreniServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonPokreniServerActionPerformed
+        PokreniServer ps = new PokreniServer();
+        ps.start();
+        System.out.println("POKRENUT SERVER");
+        jButtonPokreniServer.setEnabled(false);
+    }//GEN-LAST:event_jButtonPokreniServerActionPerformed
 
     /**
      * @param args the command line arguments
@@ -104,12 +161,26 @@ public class ServerForma extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonPokreniServer;
+    private javax.swing.JLabel jLabelMax;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTable jTablePoruke;
     private javax.swing.JTable jTableUseri;
     // End of variables declaration//GEN-END:variables
 
-    private void osveziTabelu() {
+    public void osveziTabelu() {
         ModelTabeleUseri mtu = new ModelTabeleUseri(Controller.getInstance().getUseri());
         jTableUseri.setModel(mtu);
+    }
+
+    private void pokreni() {
+        jLabelMax.setText("Maksimalan broj klijenata: " + konfiguracija.Konfiguracija.getInstance().getKonfig("max_br_klijenata"));
+    }
+
+    public void osveziPoruke() {
+        List<Poruka> poruke = Controller.getInstance().vratiPoruke();
+        ModelTabelePoruke mtp = new ModelTabelePoruke(poruke);
+        jTablePoruke.setModel(mtp);
     }
 }

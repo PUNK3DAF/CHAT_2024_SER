@@ -19,9 +19,13 @@ public class Konekcija {
     private static Konekcija instance;
     private Connection konek;
 
+    public Connection getKonek() {
+        return konek;
+    }
+
     private Konekcija() {
         try {
-            String url = "jdbc:mysql://localhost:3306/chatispit";
+            String url = "jdbc:mysql://localhost:3306/chat2024";
             konek = DriverManager.getConnection(url, "root", "");
             konek.setAutoCommit(false);
         } catch (SQLException ex) {

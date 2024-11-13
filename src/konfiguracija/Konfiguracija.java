@@ -26,6 +26,7 @@ public class Konfiguracija {
     private Konfiguracija() {
         FileInputStream fis = null;
         try {
+            konfig = new Properties();
             putanja = "C:\\Users\\vldmrk\\OneDrive - Fakultet organizacionih nauka\\Documents\\NetBeansProjects\\CHAT_ISPIT_SER\\konfig\\app.config";
             File fajl = new File(putanja);
             fis = new FileInputStream(fajl);

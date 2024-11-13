@@ -19,7 +19,7 @@ import konfiguracija.Konfiguracija;
 public class PokreniServer extends Thread {
 
     private int brojac = 0;
-    private final int max = Integer.parseInt(Konfiguracija.getInstance().getKonfig("max_broj_klijenata"));
+    private final int max = Integer.parseInt(Konfiguracija.getInstance().getKonfig("max_br_klijenata"));
     private boolean kraj = false;
     private ServerSocket ss;
 
@@ -28,14 +28,16 @@ public class PokreniServer extends Thread {
         try {
             ss = new ServerSocket(9000);
             while (!kraj) {
-                if (brojac < max) {
+                if (brojac <= max) {
                     Socket s = ss.accept();
-                    System.out.println("Klijent broj " + brojac + 1 + " povezan");
+                    System.out.println("Klijent broj " + (brojac + 1) + " povezan");
                     ObradaKlijentskihZahteva okz = new ObradaKlijentskihZahteva(s);
+                    controller.Controller.getInstance().getNiti().add(okz);
                     okz.start();
                     brojac++;
                 } else {
                     JOptionPane.showMessageDialog(null, "NE MOZE VISE KLIJENATA", "GRESKA", JOptionPane.ERROR_MESSAGE);
+                    zaustaviServer();
                 }
             }
         } catch (IOException ex) {

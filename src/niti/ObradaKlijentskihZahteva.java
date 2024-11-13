@@ -4,12 +4,17 @@
  */
 package niti;
 
+import controller.Controller;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Poruka;
+import model.User;
+import operacije.Operacije;
 import transfer.KlijentskiZahtev;
 import transfer.ServerskiOdgovor;
 
@@ -19,7 +24,7 @@ import transfer.ServerskiOdgovor;
  */
 public class ObradaKlijentskihZahteva extends Thread {
 
-    private Socket s;
+    private final Socket s;
 
     public ObradaKlijentskihZahteva(Socket s) {
         this.s = s;
@@ -32,7 +37,20 @@ public class ObradaKlijentskihZahteva extends Thread {
             ServerskiOdgovor so = new ServerskiOdgovor();
             switch (kz.getOperacija()) {
                 case operacije.Operacije.LOGIN:
-
+                    User u = Controller.getInstance().login((User) kz.getParam());
+                    so.setOperacija(Operacije.LOGIN);
+                    so.setOdgovor(u);
+                    break;
+                case operacije.Operacije.LOGOUT:
+                    Controller.getInstance().logout((User) kz.getParam());
+                    break;
+                case operacije.Operacije.POSALJI_USERE:
+                    List<User> useri = Controller.getInstance().vratiUsere();
+                    so.setOdgovor(useri);
+                    so.setOperacija(Operacije.POSALJI_USERE);
+                    break;
+                case Operacije.PORUKA:
+                    Controller.getInstance().posalji((Poruka) kz.getParam());
                     break;
                 default:
                     throw new AssertionError();
@@ -42,7 +60,7 @@ public class ObradaKlijentskihZahteva extends Thread {
         }
     }
 
-    private KlijentskiZahtev primiZahtev() {
+    public KlijentskiZahtev primiZahtev() {
         try {
             ObjectInputStream ois = new ObjectInputStream(s.getInputStream());
             return (KlijentskiZahtev) ois.readObject();
@@ -52,7 +70,8 @@ public class ObradaKlijentskihZahteva extends Thread {
         return null;
     }
 
-    private void posaljiOdgovor(ServerskiOdgovor so) {
+    public void posaljiOdgovor(ServerskiOdgovor so) {
+
         try {
             ObjectOutputStream oos = new ObjectOutputStream(s.getOutputStream());
             oos.writeObject(so);
@@ -60,6 +79,11 @@ public class ObradaKlijentskihZahteva extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(ObradaKlijentskihZahteva.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void posaljiUsere(List<User> useri) {
+        ServerskiOdgovor so = new ServerskiOdgovor(useri, Operacije.POSALJI_USERE);
+        posaljiOdgovor(so);
     }
 
 }
